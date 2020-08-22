@@ -1,0 +1,1 @@
+..\data_merge\lstmf\num.mnist.exp0.lstmf

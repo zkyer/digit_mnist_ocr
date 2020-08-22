@@ -1,0 +1,29 @@
+---------------------------------------------------------------
+*文件说明：
+eng.traineddata		best下载的eng语言包
+
+*文件夹说明：
+output			训练输出，含生成的语言包
+-----------------------------------------------------------------
+*训练步骤（假设已获得每张图10个数字的jpg图像）（最近版直接生成tif，不需要第1，2步）
+1..从已有.traineddata文件中提取.lstm文件
+   从https://github.com/tesseract-ocr/tessdata_best对应语言例如这里是eng提取
+   命令行：combine_tessdata -e eng.traineddata eng.lstm
+2.训练
+   创建txt 写入.lstmf文件路径，命令行：echo .\num.mnist.exp0.lstmf>eng.training_files.txt 		( txt会多出一行空行，如果下面训练出错把空行去掉 )
+   训练命令行：lstmtraining --debug_interval -1 --max_iterations 6000 --target_error_rate 0.01 --continue_from=".\eng.lstm"  --model_output=".\output\output" --train_listfile=".\eng.training_files.txt" --traineddata=".\eng.traineddata"  
+   随着训练均方根、Δ、train（错误率）都会下降，结束会显示finish
+3.合并模型
+   将checkpoint文件和.traineddata文件合并成新的.traineddata文件
+   命令行：lstmtraining --stop_training --traineddata=".\eng.traineddata" --continue_from=".\output\output_checkpoint"  --model_output=".\output\mnist_aug2.traineddata"
+
+4.完成，开始测试
+   两种测试方式，1.利用测试集进行测试，2.将新生成的语言包导入安装路径进行实际的文字识别。
+   ------------------------------
+   *测试方式1：测试集测试
+   ①生成测试集.lstmf文件，前边已生成到 data_merge\lstmf\num_test.mnist.exp0.lstmf
+   ②创建写有 .lstmf文件路径的txt文件（train/目录下执行）：
+       命令行：set /p =..\data_merge\lstmf\num_test.mnist.exp0.lstmf<nul>eng.test_files.txt 
+   ③测试（train/目录下执行）
+       lstmeval --model=".\output\mnist.traineddata" --eval_listfile=".\eng.test_files.txt"
+  

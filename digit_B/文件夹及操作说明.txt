@@ -1,0 +1,35 @@
+-----------------------------------------------------------------------------------
+*文件夹说明
+creat_data		创建数据文件夹，从mnist数据集获取数据到data_test	、data_train
+data_test			测试集数据文件夹，数据由creat_data获取
+data_train			训练集数据文件夹，数据由creat_data获取
+data_merge		合并数据文件夹，负责将图像合成多数字图像，并最终合成 tif
+train			训练文件夹
+outdatedApplets		存储已过时的小程序
+-----------------------------------------------------------------------------------
+*项目总操作步骤
+1.creat_data文件夹下操作
+   获取图像数据（data_test/、data_train/）：使用creat_data/creat_data.py 
+ 
+2.data_merge文件夹下操作
+①获取合并数据（mergeData_train/、mergeData_test）：
+   使用 data_merge/pro_mergeImg/merge_img.py 
+   同时生成合并数据数字序列字典（ Dict/ ），用于判断正确率及纠正box文件
+②合成tif：使用jTessBoxEditor，合成tif放 mergeTif/
+③命令行生成box（ mergeTif/目录下运行）
+   tesseract num.mnist.exp0.tif num.mnist.exp0 -l eng --psm 6 lstmbox
+   tesseract num_test.mnist.exp0.tif num_test.mnist.exp0 -l eng --psm 6 lstmbox
+④对box文件矫正（三种方法）
+   jTessBoxEditor矫正
+   直接打开box文件矫正
+   程序矫正 check_box.py
+⑤命令行生成lstmf文件用于训练/测试（ mergeTif/目录下运行）
+   cd .. & md lstmf & cd mergeTif
+   tesseract num.mnist.exp0.tif ../lstmf/num.mnist.exp0 -l eng --psm 6 lstm.train
+   tesseract num_test.mnist.exp0.tif ../lstmf/num_test.mnist.exp0 -l eng --psm 6 lstm.train
+
+注：文件夹说明见=> data_merge/文件夹说明.txt
+
+3.train文件夹下操作 
+训练，具体见=> train/说明.txt
+-----------------------------------------------------------------------------------
